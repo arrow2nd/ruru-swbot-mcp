@@ -181,10 +181,14 @@ const DEVICE_COMMANDS: Record<string, CommandInfo[]> = {
 // 赤外線リモコンのデフォルトコマンド
 const IR_REMOTE_COMMANDS: Record<string, CommandInfo[]> = {
 	"Air Conditioner": [
+		{ command: "turnOn", description: "電源ON" },
+		{ command: "turnOff", description: "電源OFF" },
 		{
 			command: "setAll",
-			description: "一括設定",
-			parameter: "temperature,mode,fanSpeed,powerState",
+			description:
+				"温度・モード・風速の一括設定（電源操作は turnOn/turnOff を使用）",
+			parameter:
+				"temperature,mode(1=auto,2=cool,3=dry,4=fan,5=heat),fanSpeed(1=auto,2=low,3=medium,4=high),powerState(on/off)",
 		},
 	],
 	TV: [
