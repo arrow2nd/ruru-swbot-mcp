@@ -20,6 +20,12 @@ describe("getCommandsForDevice", () => {
 			assert.ok(setAll.parameter?.includes("fanSpeed"));
 		});
 
+		it("setAll の parameter に具体例が含まれている", () => {
+			const setAll = commands.find((c) => c.command === "setAll");
+			assert.ok(setAll);
+			assert.match(setAll.parameter!, /例:/);
+		});
+
 		it("setAll の description が電源操作に turnOn/turnOff を使うよう案内している", () => {
 			const setAll = commands.find((c) => c.command === "setAll");
 			assert.ok(setAll);

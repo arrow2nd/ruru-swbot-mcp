@@ -186,9 +186,9 @@ const IR_REMOTE_COMMANDS: Record<string, CommandInfo[]> = {
 		{
 			command: "setAll",
 			description:
-				"温度・モード・風速の一括設定（電源操作は turnOn/turnOff を使用）",
+				"温度・モード・風速の一括設定。電源の ON/OFF は turnOn/turnOff を使うこと",
 			parameter:
-				"temperature,mode(1=auto,2=cool,3=dry,4=fan,5=heat),fanSpeed(1=auto,2=low,3=medium,4=high),powerState(on/off)",
+				'例: "26,1,1,on" — temperature,mode(0=manual/1=auto),fanSpeed(1=auto/2=low/3=medium/4=high),powerState(on固定)',
 		},
 	],
 	TV: [
