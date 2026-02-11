@@ -7,7 +7,7 @@ import { registerSceneTools } from "./tools/scenes.js";
 export function createMcpServer(client: SwitchBotClient): McpServer {
 	const server = new McpServer({
 		name: "ruru-swbot-mcp",
-		version: "1.0.0",
+		version: "1.1.0",
 	});
 
 	const registry = new DeviceRegistry(client);
