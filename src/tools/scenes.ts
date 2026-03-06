@@ -2,6 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { SwitchBotClient } from "../client.js";
 import type { DeviceRegistry } from "../device-registry.js";
+import { formatSceneList, formatSceneResult } from "../format.js";
+import { sanitize } from "../sanitize.js";
 
 export function registerSceneTools(
 	server: McpServer,
@@ -21,7 +23,7 @@ export function registerSceneTools(
 				content: [
 					{
 						type: "text" as const,
-						text: JSON.stringify(scenes, null, 2),
+						text: formatSceneList(scenes),
 					},
 				],
 			};
@@ -40,14 +42,15 @@ export function registerSceneTools(
 			},
 		},
 		async (args) => {
-			const scene = await registry.resolveScene(args.sceneName);
-			const result = await client.executeScene(scene.sceneId);
+			const sceneName = sanitize(args.sceneName);
+			const scene = await registry.resolveScene(sceneName);
+			await client.executeScene(scene.sceneId);
 
 			return {
 				content: [
 					{
 						type: "text" as const,
-						text: JSON.stringify(result, null, 2),
+						text: formatSceneResult(scene.sceneName),
 					},
 				],
 			};

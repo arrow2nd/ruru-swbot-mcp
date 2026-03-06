@@ -3,6 +3,12 @@ import { z } from "zod";
 import type { SwitchBotClient } from "../client.js";
 import { isBuiltinIrCommand } from "../commands.js";
 import type { DeviceRegistry } from "../device-registry.js";
+import {
+	formatCommandResult,
+	formatDeviceList,
+	formatDeviceStatus,
+} from "../format.js";
+import { sanitize } from "../sanitize.js";
 
 export function registerDeviceTools(
 	server: McpServer,
@@ -22,7 +28,7 @@ export function registerDeviceTools(
 				content: [
 					{
 						type: "text" as const,
-						text: JSON.stringify(devices, null, 2),
+						text: formatDeviceList(devices),
 					},
 				],
 			};
@@ -41,7 +47,8 @@ export function registerDeviceTools(
 			},
 		},
 		async (args) => {
-			const device = await registry.resolveDevice(args.deviceName);
+			const deviceName = sanitize(args.deviceName);
+			const device = await registry.resolveDevice(deviceName);
 
 			// 赤外線リモコンはステータス取得非対応
 			if (device.isInfrared) {
@@ -64,7 +71,7 @@ export function registerDeviceTools(
 				content: [
 					{
 						type: "text" as const,
-						text: JSON.stringify(statusWithoutId, null, 2),
+						text: formatDeviceStatus(device.deviceName, statusWithoutId),
 					},
 				],
 			};
@@ -92,18 +99,23 @@ export function registerDeviceTools(
 			},
 		},
 		async (args) => {
-			const device = await registry.resolveDevice(args.deviceName);
+			const deviceName = sanitize(args.deviceName);
+			const command = sanitize(args.command);
+			const parameter = args.parameter
+				? sanitize(args.parameter)
+				: args.parameter;
+
+			const device = await registry.resolveDevice(deviceName);
 
 			// 赤外線リモコンのカスタムボタンのみ commandType: "customize" を使用
 			const isCustom =
-				device.isInfrared &&
-				!isBuiltinIrCommand(device.deviceType, args.command);
+				device.isInfrared && !isBuiltinIrCommand(device.deviceType, command);
 			const commandType = isCustom ? "customize" : "command";
 
 			const result = await client.sendCommand(
 				device.deviceId,
-				args.command,
-				args.parameter,
+				command,
+				parameter,
 				commandType,
 			);
 
@@ -111,7 +123,7 @@ export function registerDeviceTools(
 				content: [
 					{
 						type: "text" as const,
-						text: JSON.stringify(result, null, 2),
+						text: formatCommandResult(device.deviceName, command, result),
 					},
 				],
 			};
