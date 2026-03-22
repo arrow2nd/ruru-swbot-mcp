@@ -9,7 +9,7 @@ import {
 } from "./format.js";
 
 describe("formatDeviceList", () => {
-	it("デバイス一覧をテーブル形式でフォーマットする", () => {
+	it("デバイス一覧をYAML形式でフォーマットする", () => {
 		const result = formatDeviceList([
 			{
 				name: "リビング照明",
@@ -26,66 +26,91 @@ describe("formatDeviceList", () => {
 			},
 		]);
 
-		assert.ok(result.includes("# デバイス一覧（2件）"));
-		assert.ok(result.includes("| リビング照明 | Color Bulb | turnOn, turnOff |"));
-		assert.ok(result.includes("| エアコン | Air Conditioner | setAll |"));
+		assert.equal(
+			result,
+			[
+				"devices:",
+				'  - name: "リビング照明"',
+				'    type: "Color Bulb"',
+				'    commands: "turnOn, turnOff"',
+				'  - name: "エアコン"',
+				'    type: "Air Conditioner"',
+				'    commands: "setAll"',
+			].join("\n"),
+		);
 	});
 
-	it("空配列では0件と表示する", () => {
+	it("空配列ではdevicesキーのみ出力する", () => {
 		const result = formatDeviceList([]);
-		assert.ok(result.includes("# デバイス一覧（0件）"));
+		assert.equal(result, "devices:");
 	});
 });
 
 describe("formatDeviceStatus", () => {
-	it("ステータスを箇条書きでフォーマットする", () => {
+	it("ステータスをYAML形式でフォーマットする", () => {
 		const result = formatDeviceStatus("リビング照明", {
 			power: "on",
 			brightness: 80,
 		});
 
-		assert.ok(result.includes("# デバイスステータス: リビング照明"));
-		assert.ok(result.includes('- **power**: "on"'));
-		assert.ok(result.includes("- **brightness**: 80"));
+		assert.equal(
+			result,
+			[
+				'device: "リビング照明"',
+				"status:",
+				'  power: "on"',
+				"  brightness: 80",
+			].join("\n"),
+		);
 	});
 });
 
 describe("formatCommandResult", () => {
-	it("コマンド実行結果をフォーマットする", () => {
+	it("コマンド実行結果をYAML形式でフォーマットする", () => {
 		const result = formatCommandResult("リビング照明", "turnOn", {
 			items: [],
 		});
 
-		assert.ok(result.includes("# コマンド実行結果"));
-		assert.ok(result.includes("「リビング照明」に `turnOn` を送信しました。"));
-		assert.ok(result.includes("- **items**: []"));
+		assert.equal(
+			result,
+			[
+				'device: "リビング照明"',
+				'command: "turnOn"',
+				"result:",
+				"  items: []",
+			].join("\n"),
+		);
 	});
 
-	it("空のレスポンスでは箇条書きを出力しない", () => {
+	it("空のレスポンスではresult: okを出力する", () => {
 		const result = formatCommandResult("リビング照明", "turnOn", {});
 
-		assert.ok(result.includes("# コマンド実行結果"));
-		assert.ok(!result.includes("- **"));
+		assert.equal(
+			result,
+			['device: "リビング照明"', 'command: "turnOn"', "result: ok"].join(
+				"\n",
+			),
+		);
 	});
 });
 
 describe("formatSceneList", () => {
-	it("シーン一覧をテーブル形式でフォーマットする", () => {
+	it("シーン一覧をYAML形式でフォーマットする", () => {
 		const result = formatSceneList([
 			{ name: "おやすみ" },
 			{ name: "おはよう" },
 		]);
 
-		assert.ok(result.includes("# シーン一覧（2件）"));
-		assert.ok(result.includes("| おやすみ |"));
-		assert.ok(result.includes("| おはよう |"));
+		assert.equal(
+			result,
+			["scenes:", '  - "おやすみ"', '  - "おはよう"'].join("\n"),
+		);
 	});
 });
 
 describe("formatSceneResult", () => {
-	it("シーン実行結果をフォーマットする", () => {
+	it("シーン実行結果をYAML形式でフォーマットする", () => {
 		const result = formatSceneResult("おやすみ");
-		assert.ok(result.includes("# シーン実行結果"));
-		assert.ok(result.includes("「おやすみ」を実行しました。"));
+		assert.equal(result, 'scene: "おやすみ"\nresult: executed');
 	});
 });
