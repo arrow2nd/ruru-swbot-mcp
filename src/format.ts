@@ -82,3 +82,25 @@ export function formatSceneList(scenes: SceneSummary[]): string {
 export function formatSceneResult(sceneName: string): string {
 	return `scene: ${yamlValue(sceneName)}\nresult: executed`;
 }
+
+/** 全デバイスのステータスをYAMLにフォーマット */
+export function formatDeviceStatuses(
+	devices: { name: string; type: string; status: Record<string, unknown> }[],
+): string {
+	if (devices.length === 0) {
+		return "devices: []";
+	}
+
+	const lines = ["devices:"];
+
+	for (const d of devices) {
+		lines.push(`  - name: ${yamlValue(d.name)}`);
+		lines.push(`    type: ${yamlValue(d.type)}`);
+		lines.push("    status:");
+		for (const [key, value] of Object.entries(d.status)) {
+			lines.push(`      ${key}: ${yamlValue(value)}`);
+		}
+	}
+
+	return lines.join("\n");
+}

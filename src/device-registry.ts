@@ -90,6 +90,36 @@ export class DeviceRegistry {
 			name: s.sceneName,
 		}));
 	}
+
+	/** 全物理デバイスのステータスを並列取得して返す（赤外線リモコンは除外） */
+	async listDeviceStatuses(): Promise<
+		{ name: string; type: string; status: Record<string, unknown> }[]
+	> {
+		await this.ensureInitialized();
+
+		const physicalDevices = this.devices.filter((d) => !d.isInfrared);
+
+		const results = await Promise.allSettled(
+			physicalDevices.map(async (d) => {
+				const { deviceId, ...status } = await this.client.getDeviceStatus(
+					d.deviceId,
+				);
+				return { name: d.deviceName, type: d.deviceType, status };
+			}),
+		);
+
+		return results
+			.filter(
+				(
+					r,
+				): r is PromiseFulfilledResult<{
+					name: string;
+					type: string;
+					status: Record<string, unknown>;
+				}> => r.status === "fulfilled",
+			)
+			.map((r) => r.value);
+	}
 }
 
 /**

@@ -42,6 +42,12 @@ claude mcp add switchbot -- npx ruru-swbot-mcp
 }
 ```
 
+## リソース
+
+| リソース名 | URI | 説明 |
+| --- | --- | --- |
+| `device_statuses` | `switchbot://devices/status` | 全物理デバイスの現在の状態（温度・湿度・電源など） |
+
 ## ツール
 
 | ツール名 | 説明 |
@@ -59,23 +65,4 @@ claude mcp add switchbot -- npx ruru-swbot-mcp
 2. get_device_status({ deviceName: "リビング照明" }) で状態を取得
 3. control_device({ deviceName: "リビング照明", command: "turnOn" }) で操作
 ```
-
-## トランスポート
-
-### stdio（デフォルト）
-
-```bash
-ruru-swbot-mcp
-```
-
-### HTTP
-
-```bash
-ruru-swbot-mcp --http
-```
-
-`PORT` 環境変数でポートを指定できます（未指定の場合はランダム）。
-
-- MCP エンドポイント: `http://localhost:<port>/mcp`
-- ヘルスチェック: `http://localhost:<port>/health`
 
